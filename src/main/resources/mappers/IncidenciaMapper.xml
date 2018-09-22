@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Incidencia">
+
+    <select id="obtenerIncidencias" resultType = "com.charlie.sistemaincidencias.entity.Incidencia">
+        
+        SELECT inc.*, prob.tipo problema, ofi.descripcion oficina 
+        FROM INCIDENCIA inc
+        INNER JOIN PROBLEMA prob
+        ON inc.idProblema = prob.idProblema
+        INNER JOIN OFICINA ofi
+        ON inc.idOficina = ofi.idOficina
+        ;
+        
+    </select>
+    
+    <select id="obtenerIncidencia" parameterType="int" resultType = "com.charlie.sistemaincidencias.entity.Incidencia">
+        
+        SELECT inc.*, prob.tipo problema, ofi.descripcion oficina 
+        FROM INCIDENCIA inc
+        INNER JOIN PROBLEMA prob
+        ON inc.idProblema = prob.idProblema
+        INNER JOIN OFICINA ofi
+        ON inc.idOficina = ofi.idOficina
+        WHERE IDINCIDENCIA= #{id};
+        
+    </select>
+    
+    <insert id="registrarIncidencia" parameterType="map" >
+        INSERT INTO INCIDENCIA 
+	( 
+        idPROBLEMA, idOFICINA, usuario
+        <if test="tecnico != null">     
+            ,tecnico
+        </if>
+        <if test="solucion !=null">
+            ,solucion  
+        </if>
+        <if test="fechaRevision !=null" >
+            ,fechaRevision
+        </if>
+        <if test="fechaTermino !=null">
+            ,fechaTermino
+        </if>
+        )
+        SELECT #{problema}, #{oficina}, #{usuario}
+        <if test="tecnico != null">     
+            ,#{tecnico}
+        </if>
+        <if test="solucion !=null">
+            ,#{solucion}  
+        </if>
+        <if test="fechaRevision !=null" >
+            ,#{fechaRevision}
+        </if>
+        <if test="fechaTermino !=null">
+            ,#{fechaTermino}
+        </if>
+        ;
+        
+    
+    </insert>
+    
+    <delete id="eliminarIncidencia" parameterType="int" >
+        DELETE FROM INCIDENCIA WHERE idINCIDENCIA = #{id};
+    </delete>
+    
+    <update id="modificarIncidencia" parameterType="map">
+        UPDATE INCIDENCIA
+        SET
+            <if test="problema !=null">
+                idPROBLEMA = (
+                SELECT idPROBLEMA FROM PROBLEMA
+                WHERE tipo=#{problema})
+            </if>
+            <if test="oficina != null">
+                ,idOFICINA = (
+                SELECT idOFICINA FROM OFICINA
+                WHERE descripcion=#{oficina})
+            </if>
+            <if test="usuario != null">
+                ,usuario = #{usuario}
+            </if>
+            <if test="tecnico != null">     
+                ,tecnico = #{tecnico}
+            </if>
+            <if test="solucion !=null">
+                ,solucion = #{solucion} 
+            </if>
+            <if test="fechaRevision !=null" >
+                ,fechaRevision = #{fechaRevision}
+            </if>
+            <if test="fechaTermino !=null">
+                ,fechaTermino = #{fechaTermino}
+            </if>
+    
+        WHERE idINCIDENCIA = #{id};
+    </update>
+        
+
+</mapper>
